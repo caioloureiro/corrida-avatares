@@ -18,6 +18,14 @@
 	--info: #3b82f6;
 }
 
+a,
+a:active,
+a:visited,
+a:focus {
+	color: var(--text-primary);
+	text-decoration: none;
+}
+
 body {
 	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	background-color: var(--dark-bg);

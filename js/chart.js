@@ -20,19 +20,32 @@ if (
 ) {
 	// Preparar dados para o Chart.js
 	const datasets = [];
+	const datas = dadosGrafico.datas; // Datas únicas
+
+	// Formatar datas para exibição
+	const datasFormatadas = datas.map((data) => {
+		const [ano, mes, dia] = data.split("-");
+		return `${dia}/${mes}/${ano}`;
+	});
 
 	for (const [avatar, dados] of Object.entries(dadosGrafico.avatares)) {
 		const cores_avatar = cores[avatar] || "#6366f1";
 
-		// Criar array de seguidores na ordem das datas
-		// Os dados já vêm na ordem correta, basta extrair os seguidores
-		const seguidores = dados.map((d) => d.seguidores);
+		// Criar um array com todos os pontos (mesmo tamanho de datas)
+		// Preencher apenas com os valores onde o avatar aparece naquela data
+		const valores = new Array(datas.length).fill(null);
 
-		console.log(`Avatar "${avatar}":`, dados);
+		dados.forEach((registro) => {
+			const dataIndex = datas.indexOf(registro.data);
+			if (dataIndex !== -1) {
+				// Se já existe um valor para esta data, usar o último
+				valores[dataIndex] = registro.seguidores;
+			}
+		});
 
 		datasets.push({
 			label: avatar,
-			data: seguidores,
+			data: valores,
 			borderColor: cores_avatar,
 			backgroundColor: cores_avatar + "20",
 			borderWidth: 3,
@@ -47,15 +60,22 @@ if (
 		});
 	}
 
-	// Formatar datas para exibição (mantendo ordem cronológica)
-	const datasFormatadas = dadosGrafico.datas.map((data) => {
-		// data vem em formato YYYY-MM-DD
-		const [ano, mes, dia] = data.split("-");
-		return `${dia}/${mes}`;
+	console.log("Datas:", datas);
+	console.log("Datas Formatadas:", datasFormatadas);
+	console.log("Datasets:", datasets);
+
+	// Encontrar o valor máximo de seguidores
+	let maxSeguidores = 0;
+	datasets.forEach((dataset) => {
+		dataset.data.forEach((valor) => {
+			if (valor !== null && valor > maxSeguidores) {
+				maxSeguidores = valor;
+			}
+		});
 	});
 
-	console.log("Datas formatadas:", datasFormatadas);
-	console.log("Datasets:", datasets);
+	// Usar o máximo como teto (sem margem adicional para bater no topo)
+	const maxComMargem = maxSeguidores > 0 ? Math.ceil(maxSeguidores) : 100;
 
 	const chart = new Chart(ctx, {
 		type: "line",
@@ -95,13 +115,16 @@ if (
 								context.dataset.label + ": " + (context.parsed.y || 0) + " seguidores"
 							);
 						},
+						title: function (context) {
+							return context[0].label;
+						},
 					},
 				},
 			},
 			scales: {
 				y: {
 					beginAtZero: true,
-					max: 2000,
+					max: maxComMargem,
 					grid: {
 						color: "#334155",
 						drawBorder: true,
@@ -117,7 +140,7 @@ if (
 					},
 					title: {
 						display: true,
-						text: "Seguidores",
+						text: "Quantidade de Seguidores",
 						color: "#cbd5e1",
 						font: {
 							size: 12,
@@ -136,10 +159,10 @@ if (
 						},
 						maxRotation: 45,
 						minRotation: 0,
-						// Mostrar apenas alguns rótulos se houver muitos dias
+						// Mostrar apenas alguns rótulos se houver muitas datas
 						callback: function (value, index, values) {
 							if (values.length > 14) {
-								// Se mais de 14 dias, mostrar a cada 2 dias
+								// Se mais de 14 datas, mostrar a cada 2
 								return index % 2 === 0 ? this.getLabelForValue(value) : "";
 							}
 							return this.getLabelForValue(value);
@@ -147,7 +170,7 @@ if (
 					},
 					title: {
 						display: true,
-						text: "Data",
+						text: "Tempo (Data)",
 						color: "#cbd5e1",
 						font: {
 							size: 12,

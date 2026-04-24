@@ -36,61 +36,52 @@ $row_data = $result_data->fetch_assoc();
 $ultima_atualizacao = $row_data['ultima_atualizacao'];
 $data_formatada = $ultima_atualizacao ? date('d/m/Y H:i:s', strtotime($ultima_atualizacao)) : 'Sem registros';
 
-// Buscar TODAS as datas únicas da tabela
-$sql_datas = "SELECT DISTINCT DATE(data) as data FROM corrida WHERE ativo = 1 ORDER BY DATE(data) ASC";
-$result_datas = $conn->query($sql_datas);
+// Buscar todos os registros em ordem de insert (por ID)
+$sql_registros = "SELECT id, nome, seguidores, data FROM corrida WHERE ativo = 1 ORDER BY id ASC";
+$result_registros = $conn->query($sql_registros);
 
-$datas_unicas = [];
-while ($row = $result_datas->fetch_assoc()) {
-	$datas_unicas[] = $row['data'];
+if (!$result_registros) {
+	die('Erro na consulta: ' . $conn->error);
 }
 
-// Para cada data e avatar, buscar o número de seguidores
+// Preparar dados agrupados por avatar, mantendo ordem de aparição
 $grafico_dados = [];
+$labels_datas = []; // Labels com datas
 
-// Buscar todos os avatares ativos
-$sql_avatares = "SELECT DISTINCT nome FROM corrida WHERE ativo = 1 ORDER BY nome ASC";
-$result_avatares = $conn->query($sql_avatares);
+$avatares_ordem = [];
+while ($row = $result_registros->fetch_assoc()) {
+	$nome = $row['nome'];
+	$seguidores = $row['seguidores'];
+	$data = $row['data'];
 
-$avatares_lista = [];
-while ($row = $result_avatares->fetch_assoc()) {
-	$avatares_lista[] = $row['nome'];
-	$grafico_dados[$row['nome']] = [];
-}
+	// Inicializar array do avatar se não existir
+	if (!isset($grafico_dados[$nome])) {
+		$grafico_dados[$nome] = [];
+		$avatares_ordem[] = $nome;
+	}
 
-// Para cada avatar e data, buscar os seguidores
-foreach ($avatares_lista as $avatar) {
-	foreach ($datas_unicas as $data) {
-		// Buscar o registro para este avatar nesta data
-		$sql_seguidores = "SELECT seguidores FROM corrida 
-		                   WHERE ativo = 1 AND nome = ? AND DATE(data) = ? 
-		                   ORDER BY data DESC LIMIT 1";
+	// Adicionar dados
+	$grafico_dados[$nome][] = [
+		'data' => $data,
+		'seguidores' => $seguidores
+	];
 
-		$stmt = $conn->prepare($sql_seguidores);
-		$stmt->bind_param("ss", $avatar, $data);
-		$stmt->execute();
-		$result_seg = $stmt->get_result();
-
-		if ($result_seg && $result_seg->num_rows > 0) {
-			$row_seg = $result_seg->fetch_assoc();
-			$grafico_dados[$avatar][] = [
-				'data' => $data,
-				'seguidores' => $row_seg['seguidores']
-			];
-		} else {
-			// Se não há registro para este avatar nesta data, deixar null
-			$grafico_dados[$avatar][] = [
-				'data' => $data,
-				'seguidores' => null
-			];
-		}
-		$stmt->close();
+	// Adicionar data ao labels se não existir
+	if (!in_array($data, $labels_datas)) {
+		$labels_datas[] = $data;
 	}
 }
 
-$grafico_json = json_encode(['datas' => $datas_unicas, 'avatares' => $grafico_dados]);
+$grafico_json = json_encode(['datas' => $labels_datas, 'avatares' => $grafico_dados]);
 
 $conn->close();
+
+$perfil_ana = 'https://www.tiktok.com/@ana.lindinha1';
+$perfil_bia = 'https://www.tiktok.com/@bia.ttshop';
+$perfil_megg = 'https://www.tiktok.com/@megg.shop';
+$perfil_luna = 'https://www.tiktok.com/@luna.shop10';
+$perfil_mel = 'https://www.tiktok.com/@mel329647';
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -185,7 +176,7 @@ $conn->close();
 				</thead>
 				<tbody>
 					<?php foreach ($avatares as $avatar): ?>
-						<tr data-id="<?php echo $avatar['id']; ?>" data-original-value="<?php echo $avatar['seguidores']; ?>">
+						<tr data-id="<?php echo $avatar['id']; ?>" data-nome="<?php echo htmlspecialchars($avatar['nome']); ?>" data-original-value="<?php echo $avatar['seguidores']; ?>">
 							<td>
 								<span class="pos-badge <?php
 														echo $avatar['posicao'] == 1 ? 'first' : ($avatar['posicao'] == 2 ? 'second' : ($avatar['posicao'] == 3 ? 'third' : ''));
@@ -196,7 +187,12 @@ $conn->close();
 							<td>
 								<div class="avatar-name">
 									<div class="avatar-initial"><?php echo strtoupper(substr($avatar['nome'], 0, 1)); ?></div>
-									<span><?php echo htmlspecialchars($avatar['nome']); ?></span>
+									<a target="_blank" href="<?php
+																$nome = $avatar['nome'];
+																echo ($nome === 'Ana') ? $perfil_ana : (($nome === 'Bia') ? $perfil_bia : (($nome === 'Megg') ? $perfil_megg : (($nome === 'Luna') ? $perfil_luna : (($nome === 'Mel') ? $perfil_mel : '#'))));
+																?>">
+										<?php echo htmlspecialchars($avatar['nome']); ?>
+									</a>
 								</div>
 							</td>
 							<td>

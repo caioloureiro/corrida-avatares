@@ -34,6 +34,7 @@ function handleInputBlur(e) {
 function updateSeguidores(input) {
 	const row = input.closest("tr");
 	const id = row.dataset.id;
+	const nome = row.dataset.nome;
 	const seguidores = parseInt(input.value, 10);
 
 	// Validar se é um número válido
@@ -59,6 +60,7 @@ function updateSeguidores(input) {
 		},
 		body: JSON.stringify({
 			id: id,
+			nome: nome,
 			seguidores: seguidores,
 		}),
 	})

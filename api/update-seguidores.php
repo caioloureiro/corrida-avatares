@@ -14,14 +14,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $input = json_decode(file_get_contents('php://input'), true);
 
-if (!isset($input['id']) || !isset($input['seguidores'])) {
+if (!isset($input['nome']) || !isset($input['seguidores'])) {
 	http_response_code(400);
 	$response['message'] = 'Dados inválidos';
 	echo json_encode($response);
 	exit;
 }
 
-$id = intval($input['id']);
+$nome = $input['nome'];
 $seguidores = intval($input['seguidores']);
 
 // Validar se seguidores é um número positivo
@@ -32,7 +32,8 @@ if ($seguidores < 0) {
 	exit;
 }
 
-$stmt = $conn->prepare("UPDATE corrida SET seguidores = ?, updated_at = NOW() WHERE id = ?");
+// Inserir novo registro em vez de atualizar
+$stmt = $conn->prepare("INSERT INTO corrida (ativo, nome, seguidores, data, created_at, updated_at) VALUES (1, ?, ?, NOW(), NOW(), NOW())");
 if (!$stmt) {
 	http_response_code(500);
 	$response['message'] = 'Erro na preparação da consulta: ' . $conn->error;
@@ -40,7 +41,7 @@ if (!$stmt) {
 	exit;
 }
 
-$stmt->bind_param("ii", $seguidores, $id);
+$stmt->bind_param("si", $nome, $seguidores);
 
 if ($stmt->execute()) {
 	$response['success'] = true;
