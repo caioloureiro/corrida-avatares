@@ -125,18 +125,6 @@ if (
 					},
 				},
 			},
-			scales: {
-				xAxes: [
-					{
-						display: false,
-					},
-				],
-				yAxes: [
-					{
-						display: false,
-					},
-				],
-			},
 		},
 	});
 }
