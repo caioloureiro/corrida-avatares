@@ -15,33 +15,29 @@ console.log("Dados do gráfico recebidos:", dadosGrafico);
 if (
 	ctx &&
 	dadosGrafico &&
-	dadosGrafico.datas &&
-	dadosGrafico.datas.length > 0
+	dadosGrafico.avatares &&
+	Object.keys(dadosGrafico.avatares).length > 0
 ) {
-	// Preparar dados para o Chart.js
+	// Preparar dados para o Chart.js - agrupar por avatar
 	const datasets = [];
-	const datas = dadosGrafico.datas; // Datas únicas
+	const labels = []; // Labels com nomes dos avatares
+	const avatares_ordem = [];
 
-	// Formatar datas para exibição
-	const datasFormatadas = datas.map((data) => {
-		const [ano, mes, dia] = data.split("-");
-		return `${dia}/${mes}/${ano}`;
-	});
+	let indice_global = 0;
 
+	// Reorganizar dados agrupados por avatar
 	for (const [avatar, dados] of Object.entries(dadosGrafico.avatares)) {
 		const cores_avatar = cores[avatar] || "#6366f1";
+		const valores = [];
 
-		// Criar um array com todos os pontos (mesmo tamanho de datas)
-		// Preencher apenas com os valores onde o avatar aparece naquela data
-		const valores = new Array(datas.length).fill(null);
-
+		// Adicionar cada aparição do avatar como um ponto
 		dados.forEach((registro) => {
-			const dataIndex = datas.indexOf(registro.data);
-			if (dataIndex !== -1) {
-				// Se já existe um valor para esta data, usar o último
-				valores[dataIndex] = registro.seguidores;
-			}
+			valores.push(registro.seguidores);
+			labels.push(avatar);
+			indice_global++;
 		});
+
+		avatares_ordem.push(avatar);
 
 		datasets.push({
 			label: avatar,
@@ -60,8 +56,7 @@ if (
 		});
 	}
 
-	console.log("Datas:", datas);
-	console.log("Datas Formatadas:", datasFormatadas);
+	console.log("Labels por Avatar:", labels);
 	console.log("Datasets:", datasets);
 
 	// Encontrar o valor máximo de seguidores
@@ -80,7 +75,7 @@ if (
 	const chart = new Chart(ctx, {
 		type: "line",
 		data: {
-			labels: datasFormatadas,
+			labels: labels,
 			datasets: datasets,
 		},
 		options: {
