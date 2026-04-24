@@ -125,6 +125,13 @@ if (
 					},
 				},
 			},
+			scales: {
+				x: {
+					ticks: {
+						display: false,
+					},
+				},
+			},
 		},
 	});
 }
