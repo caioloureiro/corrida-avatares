@@ -838,7 +838,7 @@ Edite em `config/db.php`:
 $host = 'localhost';        // Servidor MySQL
 $db_name = 'airbr_flow';    // Nome do banco
 $user = 'root';             // Usuário
-$password = 'caio1234';     // Senha
+$password = '';     // Senha
 ```
 
 ### Personalizar Cores
