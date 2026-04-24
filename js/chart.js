@@ -10,6 +10,8 @@ const cores = {
 // Configurar o gráfico
 const ctx = document.getElementById("graficoEvolucao");
 
+console.log("Dados do gráfico recebidos:", dadosGrafico);
+
 if (
 	ctx &&
 	dadosGrafico &&
@@ -21,20 +23,12 @@ if (
 
 	for (const [avatar, dados] of Object.entries(dadosGrafico.avatares)) {
 		const cores_avatar = cores[avatar] || "#6366f1";
-		const dados_por_data = {};
-
-		// Inicializar com null para todas as datas
-		dadosGrafico.datas.forEach((data) => {
-			dados_por_data[data] = null;
-		});
-
-		// Preencher com dados disponíveis
-		dados.forEach((d) => {
-			dados_por_data[d.data] = d.seguidores;
-		});
 
 		// Criar array de seguidores na ordem das datas
-		const seguidores = dadosGrafico.datas.map((data) => dados_por_data[data]);
+		// Os dados já vêm na ordem correta, basta extrair os seguidores
+		const seguidores = dados.map((d) => d.seguidores);
+
+		console.log(`Avatar "${avatar}":`, dados);
 
 		datasets.push({
 			label: avatar,
@@ -53,11 +47,15 @@ if (
 		});
 	}
 
-	// Formatar datas para exibição
+	// Formatar datas para exibição (mantendo ordem cronológica)
 	const datasFormatadas = dadosGrafico.datas.map((data) => {
-		const d = new Date(data + "T00:00:00");
-		return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+		// data vem em formato YYYY-MM-DD
+		const [ano, mes, dia] = data.split("-");
+		return `${dia}/${mes}`;
 	});
+
+	console.log("Datas formatadas:", datasFormatadas);
+	console.log("Datasets:", datasets);
 
 	const chart = new Chart(ctx, {
 		type: "line",
@@ -135,6 +133,16 @@ if (
 						color: "#cbd5e1",
 						font: {
 							size: 11,
+						},
+						maxRotation: 45,
+						minRotation: 0,
+						// Mostrar apenas alguns rótulos se houver muitos dias
+						callback: function (value, index, values) {
+							if (values.length > 14) {
+								// Se mais de 14 dias, mostrar a cada 2 dias
+								return index % 2 === 0 ? this.getLabelForValue(value) : "";
+							}
+							return this.getLabelForValue(value);
 						},
 					},
 					title: {

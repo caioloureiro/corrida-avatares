@@ -30,41 +30,64 @@ $media_seguidores = count($avatares) > 0 ? intval($total_seguidores / count($ava
 $progresso_total = count($avatares) > 0 ? ($total_seguidores / ($META_SEGUIDORES * count($avatares))) * 100 : 0;
 
 // Buscar data da última modificação
-require_once __DIR__ . '/config/db.php';
 $sql_data = "SELECT MAX(updated_at) as ultima_atualizacao FROM corrida WHERE ativo = 1";
 $result_data = $conn->query($sql_data);
 $row_data = $result_data->fetch_assoc();
 $ultima_atualizacao = $row_data['ultima_atualizacao'];
 $data_formatada = $ultima_atualizacao ? date('d/m/Y H:i:s', strtotime($ultima_atualizacao)) : 'Sem registros';
 
-// Buscar dados históricos para o gráfico
-require_once __DIR__ . '/config/db.php';
-$sql_historico = "SELECT nome, seguidores, DATE(data) as data FROM corrida WHERE ativo = 1 ORDER BY data ASC";
-$result_historico = $conn->query($sql_historico);
+// Buscar TODAS as datas únicas da tabela
+$sql_datas = "SELECT DISTINCT DATE(data) as data FROM corrida WHERE ativo = 1 ORDER BY DATE(data) ASC";
+$result_datas = $conn->query($sql_datas);
 
-$dados_historicos = [];
-while ($row = $result_historico->fetch_assoc()) {
-	$dados_historicos[] = $row;
-}
-
-// Organizar dados por avatar
-$grafico_dados = [];
 $datas_unicas = [];
+while ($row = $result_datas->fetch_assoc()) {
+	$datas_unicas[] = $row['data'];
+}
 
-foreach ($dados_historicos as $dado) {
-	if (!isset($grafico_dados[$dado['nome']])) {
-		$grafico_dados[$dado['nome']] = [];
-	}
-	$grafico_dados[$dado['nome']][] = [
-		'data' => $dado['data'],
-		'seguidores' => $dado['seguidores']
-	];
-	if (!in_array($dado['data'], $datas_unicas)) {
-		$datas_unicas[] = $dado['data'];
+// Para cada data e avatar, buscar o número de seguidores
+$grafico_dados = [];
+
+// Buscar todos os avatares ativos
+$sql_avatares = "SELECT DISTINCT nome FROM corrida WHERE ativo = 1 ORDER BY nome ASC";
+$result_avatares = $conn->query($sql_avatares);
+
+$avatares_lista = [];
+while ($row = $result_avatares->fetch_assoc()) {
+	$avatares_lista[] = $row['nome'];
+	$grafico_dados[$row['nome']] = [];
+}
+
+// Para cada avatar e data, buscar os seguidores
+foreach ($avatares_lista as $avatar) {
+	foreach ($datas_unicas as $data) {
+		// Buscar o registro para este avatar nesta data
+		$sql_seguidores = "SELECT seguidores FROM corrida 
+		                   WHERE ativo = 1 AND nome = ? AND DATE(data) = ? 
+		                   ORDER BY data DESC LIMIT 1";
+
+		$stmt = $conn->prepare($sql_seguidores);
+		$stmt->bind_param("ss", $avatar, $data);
+		$stmt->execute();
+		$result_seg = $stmt->get_result();
+
+		if ($result_seg && $result_seg->num_rows > 0) {
+			$row_seg = $result_seg->fetch_assoc();
+			$grafico_dados[$avatar][] = [
+				'data' => $data,
+				'seguidores' => $row_seg['seguidores']
+			];
+		} else {
+			// Se não há registro para este avatar nesta data, deixar null
+			$grafico_dados[$avatar][] = [
+				'data' => $data,
+				'seguidores' => null
+			];
+		}
+		$stmt->close();
 	}
 }
 
-sort($datas_unicas);
 $grafico_json = json_encode(['datas' => $datas_unicas, 'avatares' => $grafico_dados]);
 
 $conn->close();
