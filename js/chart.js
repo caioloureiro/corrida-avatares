@@ -86,6 +86,15 @@ if (
 		options: {
 			responsive: true,
 			maintainAspectRatio: false,
+			clip: false,
+			layout: {
+				padding: {
+					bottom: 0,
+					top: 0,
+					left: 10,
+					right: 10,
+				},
+			},
 			plugins: {
 				legend: {
 					display: true,
@@ -122,62 +131,16 @@ if (
 				},
 			},
 			scales: {
-				y: {
-					beginAtZero: true,
-					max: maxComMargem,
-					grid: {
-						color: "#334155",
-						drawBorder: true,
-					},
-					ticks: {
-						color: "#cbd5e1",
-						font: {
-							size: 11,
-						},
-						callback: function (value) {
-							return value.toLocaleString("pt-BR");
-						},
-					},
-					title: {
-						display: true,
-						text: "Quantidade de Seguidores",
-						color: "#cbd5e1",
-						font: {
-							size: 12,
-							weight: "600",
-						},
-					},
-				},
-				x: {
-					grid: {
+				xAxes: [
+					{
 						display: false,
 					},
-					ticks: {
-						color: "#cbd5e1",
-						font: {
-							size: 11,
-						},
-						maxRotation: 45,
-						minRotation: 0,
-						// Mostrar apenas alguns rótulos se houver muitas datas
-						callback: function (value, index, values) {
-							if (values.length > 14) {
-								// Se mais de 14 datas, mostrar a cada 2
-								return index % 2 === 0 ? this.getLabelForValue(value) : "";
-							}
-							return this.getLabelForValue(value);
-						},
+				],
+				yAxes: [
+					{
+						display: false,
 					},
-					title: {
-						display: true,
-						text: "Tempo (Data)",
-						color: "#cbd5e1",
-						font: {
-							size: 12,
-							weight: "600",
-						},
-					},
-				},
+				],
 			},
 		},
 	});

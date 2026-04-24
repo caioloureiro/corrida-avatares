@@ -90,12 +90,17 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Corrida de Avatares - Dashboard</title>
-	<link rel="stylesheet" href="./css/style.css">
-	<link rel="stylesheet" href="./css/filtros.css">
 	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 </head>
 
 <body>
+	<style>
+		<?php
+		require 'css/style.css';
+		require 'css/filtros.css';
+		?>
+	</style>
+
 	<header>
 		<div class="container">
 			<h1>🏁 Corrida de Avatares</h1>
