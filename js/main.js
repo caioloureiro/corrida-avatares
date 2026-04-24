@@ -52,7 +52,7 @@ function updateSeguidores(input) {
 	// Desabilitar o input enquanto atualiza
 	input.disabled = true;
 
-	fetch("/api/update-seguidores.php", {
+	fetch("./api/update-seguidores.php", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
