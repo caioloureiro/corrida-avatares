@@ -81,11 +81,10 @@ if (
 		options: {
 			responsive: true,
 			maintainAspectRatio: false,
-			clip: false,
 			layout: {
 				padding: {
-					bottom: 0,
-					top: 0,
+					bottom: 10,
+					top: 10,
 					left: 10,
 					right: 10,
 				},
