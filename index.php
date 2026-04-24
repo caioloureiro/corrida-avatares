@@ -77,6 +77,7 @@ $conn->close();
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Corrida de Avatares - Dashboard</title>
 	<link rel="stylesheet" href="./css/style.css">
+	<link rel="stylesheet" href="./css/filtros.css">
 	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 </head>
 
@@ -120,6 +121,26 @@ $conn->close();
 				<div class="value" style="font-size: 1.2em;">🕐</div>
 				<div class="meta"><?php echo $data_formatada; ?></div>
 			</div>
+		</div>
+
+		<!-- Painel de Filtros -->
+		<div class="filtro-section">
+			<h2>🔍 Filtros e Comparação</h2>
+			<div class="filtro-header">
+				<div class="filtro-group">
+					<label for="data-inicio">Data de Início</label>
+					<input type="date" id="data-inicio" name="data-inicio">
+				</div>
+				<div class="filtro-group">
+					<label for="data-fim">Data de Fim</label>
+					<input type="date" id="data-fim" name="data-fim">
+				</div>
+				<div class="filtro-buttons">
+					<button class="btn-filtrar" id="btn-filtrar">🔎 Filtrar</button>
+					<button class="btn-reset-filtro" id="btn-reset-filtro">↻ Limpar</button>
+				</div>
+			</div>
+			<div id="filtro-resultados"></div>
 		</div>
 
 		<!-- Tabela de Corrida -->
@@ -198,6 +219,8 @@ $conn->close();
 		const dadosGrafico = <?php echo $grafico_json; ?>;
 	</script>
 	<script src="./js/chart.js"></script>
+	<script src="./js/filtros.js"></script>
+	<script src="./js/achievements.js"></script>
 	<script src="./js/main.js"></script>
 </body>
 
