@@ -165,7 +165,7 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 		<!-- Tabela de Corrida -->
 		<div class="table-section">
 			<div class="table-header">
-				<h2>📊 Ranking de Seguidores</h2>
+				<h2>📊 Ranking de Pedreiros</h2>
 				<p>Clique nos valores e pressione Enter para editar • Meta: 2.000 seguidores por avatar</p>
 			</div>
 
