@@ -44,13 +44,13 @@ if (
 			data: valores,
 			borderColor: cores_avatar,
 			backgroundColor: cores_avatar + "20",
-			borderWidth: 3,
+			borderWidth: 3, //Linha do gráfico
 			fill: true,
 			tension: 0.4,
-			pointRadius: 6,
+			pointRadius: 1, //Pontos do gráfico
 			pointBackgroundColor: cores_avatar,
 			pointBorderColor: "#fff",
-			pointBorderWidth: 2,
+			pointBorderWidth: 1,
 			pointHoverRadius: 8,
 			spanGaps: true,
 		});
@@ -83,6 +83,7 @@ if (
 			maintainAspectRatio: false,
 			layout: {
 				padding: {
+					//Espaçamento interno do gráfico
 					bottom: 10,
 					top: 10,
 					left: 10,
@@ -91,6 +92,7 @@ if (
 			},
 			plugins: {
 				legend: {
+					//Nomes do topo do gráfico
 					display: true,
 					position: "top",
 					labels: {
@@ -105,6 +107,7 @@ if (
 					},
 				},
 				tooltip: {
+					//Tooltip personalizado
 					backgroundColor: "#1e293b",
 					borderColor: "#6366f1",
 					borderWidth: 2,
@@ -114,12 +117,10 @@ if (
 					displayColors: true,
 					callbacks: {
 						label: function (context) {
-							return (
-								context.dataset.label + ": " + (context.parsed.y || 0) + " seguidores"
-							);
+							return (context.parsed.y || 0) + " seguidores";
 						},
 						title: function (context) {
-							return context[0].label;
+							return context[0].dataset.label;
 						},
 					},
 				},
