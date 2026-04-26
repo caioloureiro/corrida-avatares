@@ -4,6 +4,18 @@ require_once __DIR__ . '/config/db.php';
 // Meta de seguidores
 $META_SEGUIDORES = 2000;
 
+// Contar o total de registros por avatar
+$sql_count_reps = "SELECT nome, COUNT(*) as repeticoes 
+FROM corrida WHERE ativo = 1
+GROUP BY nome";
+$result_reps = $conn->query($sql_count_reps);
+
+$repeticoes_por_nome = [];
+
+while ($row_rep = $result_reps->fetch_assoc()) {
+	$repeticoes_por_nome[$row_rep['nome']] = $row_rep['repeticoes'];
+}
+
 // Buscar dados da tabela corrida - apenas o registro mais recente de cada avatar
 $sql = "SELECT * FROM corrida WHERE ativo = 1 AND id IN (
     SELECT MAX(id) FROM corrida WHERE ativo = 1 GROUP BY nome
@@ -17,10 +29,19 @@ if (!$result) {
 $avatares = [];
 $posicao = 1;
 $total_seguidores = 0;
+$repeticoes_primeiro = null;
 
 while ($row = $result->fetch_assoc()) {
 	$row['posicao'] = $posicao;
 	$row['percentual'] = ($row['seguidores'] / $META_SEGUIDORES) * 100;
+	$repeticoes_avatar = isset($repeticoes_por_nome[$row['nome']]) ? $repeticoes_por_nome[$row['nome']] : 0;
+
+	// Armazenar as repetições do primeiro colocado
+	if ($posicao === 1) {
+		$repeticoes_primeiro = $repeticoes_avatar;
+	}
+
+	$row['desatualizado'] = ($repeticoes_avatar !== $repeticoes_primeiro) ? true : false;
 	$avatares[] = $row;
 	$total_seguidores += $row['seguidores'];
 	$posicao++;
@@ -181,7 +202,7 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 				</thead>
 				<tbody>
 					<?php foreach ($avatares as $avatar): ?>
-						<tr data-id="<?php echo $avatar['id']; ?>" data-nome="<?php echo htmlspecialchars($avatar['nome']); ?>" data-original-value="<?php echo $avatar['seguidores']; ?>">
+						<tr data-id="<?php echo $avatar['id']; ?>" data-nome="<?php echo htmlspecialchars($avatar['nome']); ?>" data-original-value="<?php echo $avatar['seguidores']; ?>" <?php echo $avatar['desatualizado'] ? 'class="desatualizado"' : ''; ?>>
 							<td>
 								<span class="pos-badge <?php
 														echo $avatar['posicao'] == 1 ? 'first' : ($avatar['posicao'] == 2 ? 'second' : ($avatar['posicao'] == 3 ? 'third' : ''));

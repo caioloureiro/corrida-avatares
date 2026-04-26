@@ -163,6 +163,15 @@ table tbody tr:hover {
 	background-color: rgba(99, 102, 241, 0.05);
 }
 
+table tbody tr.desatualizado {
+	background-color: rgba(239, 68, 68, 0.1);
+	border-left: 3px solid #ef4444;
+}
+
+table tbody tr.desatualizado:hover {
+	background-color: rgba(239, 68, 68, 0.15);
+}
+
 table tbody tr:last-child td {
 	border-bottom: none;
 }
