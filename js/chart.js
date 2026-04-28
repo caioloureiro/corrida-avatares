@@ -44,10 +44,10 @@ if (
 			data: valores,
 			borderColor: cores_avatar,
 			backgroundColor: cores_avatar + "20",
-			borderWidth: 3, //Linha do gráfico
+			borderWidth: 1, //Linha do gráfico
 			fill: true,
 			tension: 0.4,
-			pointRadius: 1, //Pontos do gráfico
+			pointRadius: 0, //Pontos do gráfico
 			pointBackgroundColor: cores_avatar,
 			pointBorderColor: "#fff",
 			pointBorderWidth: 1,
