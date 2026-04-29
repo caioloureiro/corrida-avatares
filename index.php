@@ -198,6 +198,7 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 						<th>Seguidores</th>
 						<th>Progresso</th>
 						<th>Percentual</th>
+						<th>Atualizações</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -237,6 +238,9 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 							</td>
 							<td>
 								<span class="percentage"><?php echo number_format($avatar['percentual'], 2, ',', '.'); ?>%</span>
+							</td>
+							<td style="text-align: center;">
+								<span class="update-count"><?php echo $repeticoes_por_nome[$avatar['nome']] ?? 0; ?></span>
 							</td>
 						</tr>
 					<?php endforeach; ?>

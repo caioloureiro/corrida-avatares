@@ -32,6 +32,24 @@ if ($seguidores < 0) {
 	exit;
 }
 
+// Verificar se já existe um registro idêntico nos últimos 5 segundos para evitar duplicatas
+$check_stmt = $conn->prepare("SELECT id FROM corrida WHERE nome = ? AND seguidores = ? AND ativo = 1 AND created_at > DATE_SUB(NOW(), INTERVAL 5 SECOND) LIMIT 1");
+$check_stmt->bind_param("si", $nome, $seguidores);
+$check_stmt->execute();
+$check_result = $check_stmt->get_result();
+
+if ($check_result->num_rows > 0) {
+	// Registro duplicado detectado, retornar sucesso para não quebrar o fluxo
+	$response['success'] = true;
+	$response['message'] = 'Registro já foi adicionado recentemente (duplicata detectada e ignorada)';
+	http_response_code(200);
+	$check_stmt->close();
+	$conn->close();
+	echo json_encode($response);
+	exit;
+}
+$check_stmt->close();
+
 // Inserir novo registro em vez de atualizar
 $stmt = $conn->prepare("INSERT INTO corrida (ativo, nome, seguidores, data, created_at, updated_at) VALUES (1, ?, ?, NOW(), NOW(), NOW())");
 if (!$stmt) {
