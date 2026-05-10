@@ -230,8 +230,7 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 									class="seguidores-input"
 									value="<?php echo $avatar['seguidores']; ?>"
 									min="0"
-									placeholder="0"
-									onkeypress="return false">
+									placeholder="0">
 								<button class="btn-gravar" onclick="gravarSeguidores(this)">Gravar</button>
 								<span class="loading"></span>
 							</td>
