@@ -203,7 +203,7 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 				</thead>
 				<tbody>
 					<?php foreach ($avatares as $avatar): ?>
-						<tr data-id="<?php echo $avatar['id']; ?>" data-nome="<?php echo htmlspecialchars($avatar['nome']); ?>" data-original-value="<?php echo $avatar['seguidores']; ?>" <?php echo $avatar['desatualizado'] ? 'class="desatualizado"' : ''; ?>>
+						<tr data-id="<?php echo $avatar['id']; ?>" data-nome="<?php echo htmlspecialchars($avatar['nome']); ?>" <?php echo $avatar['desatualizado'] ? 'class="desatualizado"' : ''; ?>>
 							<td>
 								<span class="pos-badge <?php
 														echo $avatar['posicao'] == 1 ? 'first' : ($avatar['posicao'] == 2 ? 'second' : ($avatar['posicao'] == 3 ? 'third' : ''));
@@ -214,10 +214,12 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 							<td>
 								<div class="avatar-name">
 									<div class="avatar-initial"><?php echo strtoupper(substr($avatar['nome'], 0, 1)); ?></div>
-									<a target="_blank" href="<?php
-																$nome = $avatar['nome'];
-																echo ($nome === 'Ana') ? $perfil_ana : (($nome === 'Bia') ? $perfil_bia : (($nome === 'Megg') ? $perfil_megg : (($nome === 'Luna') ? $perfil_luna : (($nome === 'Mel') ? $perfil_mel : '#'))));
-																?>">
+									<a
+										target="_blank"
+										href="<?php
+												$nome = $avatar['nome'];
+												echo ($nome === 'Ana') ? $perfil_ana : (($nome === 'Bia') ? $perfil_bia : (($nome === 'Megg') ? $perfil_megg : (($nome === 'Luna') ? $perfil_luna : (($nome === 'Mel') ? $perfil_mel : '#'))));
+												?>">
 										<?php echo htmlspecialchars($avatar['nome']); ?>
 									</a>
 								</div>
@@ -228,7 +230,9 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 									class="seguidores-input"
 									value="<?php echo $avatar['seguidores']; ?>"
 									min="0"
-									placeholder="0">
+									placeholder="0"
+									onkeypress="return false">
+								<button class="btn-gravar" onclick="gravarSeguidores(this)">Gravar</button>
 								<span class="loading"></span>
 							</td>
 							<td>
