@@ -119,6 +119,7 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 		<?php
 		require 'css/style.css';
 		require 'css/filtros.css';
+		require 'css/cronometro.css';
 		?>
 	</style>
 
@@ -263,6 +264,54 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 			</div>
 			<div class="chart-container">
 				<canvas id="graficoEvolucao"></canvas>
+			</div>
+		</div>
+
+		<!-- Cronômetro para fazer a interação no Timeline -->
+		<div class="table-section">
+			<div class="table-header">
+				<h2>⏱️ Cronômetro</h2>
+				<p>Interaja com o Timeline</p>
+			</div>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Avatar</th>
+						<th>Cronômetro</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($avatares as $avatar): ?>
+						<tr data-nome="<?php echo htmlspecialchars($avatar['nome']); ?>">
+							<td>
+								<div class="avatar-name">
+									<div class="avatar-initial"><?php echo strtoupper(substr($avatar['nome'], 0, 1)); ?></div>
+									<a
+										target="_blank"
+										href="<?php
+												$nome = $avatar['nome'];
+												echo ($nome === 'Ana') ? $perfil_ana : (($nome === 'Bia') ? $perfil_bia : (($nome === 'Megg') ? $perfil_megg : (($nome === 'Luna') ? $perfil_luna : (($nome === 'Mel') ? $perfil_mel : '#'))));
+												?>">
+										<?php echo htmlspecialchars($avatar['nome']); ?>
+									</a>
+								</div>
+							</td>
+							<td>
+								<div class="cronometro" id="cronometro-<?php echo htmlspecialchars($avatar['nome']); ?>">
+									<span class="tempo">00:00:00</span>
+									<button class="btn-start" onclick="startCronometro('<?php echo htmlspecialchars($avatar['nome']); ?>')">▶️</button>
+									<button class="btn-stop" onclick="stopCronometro('<?php echo htmlspecialchars($avatar['nome']); ?>')">⏹️</button>
+									<button class="btn-reset" onclick="resetCronometro('<?php echo htmlspecialchars($avatar['nome']); ?>')">↻</button>
+								</div>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+
+			<div class="info-text">
+				ℹ️ <strong>Como usar:</strong> Clique no botão de cronômetro para iniciar, parar ou resetar o tempo. O valor será salvo automaticamente no banco de dados.
 			</div>
 		</div>
 	</main>
