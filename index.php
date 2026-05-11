@@ -316,13 +316,13 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 		</div>
 	</main>
 
+	<script src="./js/main.js"></script>
 	<script>
 		const dadosGrafico = <?php echo $grafico_json; ?>;
 	</script>
 	<script src="./js/chart.js"></script>
 	<script src="./js/filtros.js"></script>
 	<script src="./js/achievements.js"></script>
-	<script src="./js/main.js"></script>
 </body>
 
 </html>
