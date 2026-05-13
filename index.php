@@ -268,7 +268,7 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 		</div>
 
 		<!-- Cronômetro para fazer a interação no Timeline -->
-		<div class="table-section">
+		<div class="table-section table-cronometro">
 			<div class="table-header">
 				<h2>⏱️ Cronômetro</h2>
 				<p>Interaja com o Timeline</p>
