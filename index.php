@@ -261,7 +261,7 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 										<?php echo number_format($seguidoresTikTok, 0, ',', '.'); ?>
 									</span>
 								<?php else: ?>
-									<span class="tiktok-seguidores-empty">Nao sincronizado</span>
+									<span class="tiktok-seguidores-empty" title="Autentique em admin-tiktok.php e clique em Buscar Agora">Não sincronizado</span>
 								<?php endif; ?>
 							</td>
 							<td>
