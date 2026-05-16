@@ -29,13 +29,20 @@ if ($action === 'authorize') {
     $_SESSION['tiktok_state'] = $state;
     $_SESSION['tiktok_avatar'] = $avatar;
     
-    // Construir URL de autorização
+    // Gerar PKCE (Proof Key for Code Exchange)
+    $codeVerifier = bin2hex(random_bytes(32)); // 64 caracteres
+    $codeChallenge = rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '=');
+    $_SESSION['tiktok_code_verifier'] = $codeVerifier;
+    
+    // Construir URL de autorização com PKCE
     $authUrl = TIKTOK_AUTH_URL . '?' . http_build_query([
         'client_key' => TIKTOK_CLIENT_KEY,
         'scope' => TIKTOK_SCOPES,
         'response_type' => 'code',
         'redirect_uri' => TIKTOK_REDIRECT_URI,
-        'state' => $state
+        'state' => $state,
+        'code_challenge' => $codeChallenge,
+        'code_challenge_method' => 'S256'
     ]);
     
     $response['success'] = true;
@@ -74,8 +81,11 @@ if ($action === 'authorize') {
         exit;
     }
     
+    // Recuperar code_verifier do PKCE
+    $codeVerifier = $_SESSION['tiktok_code_verifier'] ?? null;
+    
     // Trocar código por token
-    $tokenData = exchangeCodeForToken($code);
+    $tokenData = exchangeCodeForToken($code, $codeVerifier);
     
     if (!$tokenData || !isset($tokenData['access_token'])) {
         http_response_code(400);
@@ -148,7 +158,7 @@ $conn->close();
 /**
  * Trocar código de autorização por token de acesso
  */
-function exchangeCodeForToken($code) {
+function exchangeCodeForToken($code, $codeVerifier = null) {
     $postFields = [
         'client_key' => TIKTOK_CLIENT_KEY,
         'client_secret' => TIKTOK_CLIENT_SECRET,
@@ -156,6 +166,11 @@ function exchangeCodeForToken($code) {
         'grant_type' => 'authorization_code',
         'redirect_uri' => TIKTOK_REDIRECT_URI
     ];
+    
+    // Adicionar code_verifier se fornecido (para PKCE)
+    if ($codeVerifier) {
+        $postFields['code_verifier'] = $codeVerifier;
+    }
     
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, TIKTOK_TOKEN_URL);

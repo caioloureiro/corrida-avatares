@@ -299,6 +299,69 @@ $conn->close();
     </style>
 </head>
 <body>
+    <!-- Wrapper functions inline para garantir disponibilidade imediata -->
+    <script>
+        // Instância global do TikTokManager
+        let tikTokManager = null;
+
+        // Funções wrapper que podem ser chamadas pelos onclick handlers
+        function ensureTikTokManager() {
+            if (!tikTokManager && typeof TikTokManager !== 'undefined') {
+                try {
+                    tikTokManager = new TikTokManager();
+                    console.log("✅ TikTokManager criado no wrapper");
+                    return true;
+                } catch (error) {
+                    console.error("❌ Erro ao criar TikTokManager no wrapper:", error);
+                    return false;
+                }
+            }
+            return !!tikTokManager;
+        }
+
+        function authenticate(avatar) {
+            if (!ensureTikTokManager()) {
+                console.error("❌ TikTokManager não disponível. Tipo da classe:", typeof TikTokManager);
+                alert("Sistema ainda está carregando. Recarregue a página.");
+                return;
+            }
+            console.log("📍 Chamando authenticate para:", avatar);
+            tikTokManager.authenticate(avatar);
+        }
+
+        function fetchFollowers(avatar) {
+            if (!ensureTikTokManager()) {
+                alert("Sistema ainda está carregando. Recarregue a página.");
+                return;
+            }
+            console.log("📍 Chamando fetchFollowers para:", avatar);
+            tikTokManager.fetchFollowers(avatar);
+        }
+
+        function fetchAllFollowers() {
+            if (!ensureTikTokManager()) {
+                alert("Sistema ainda está carregando. Recarregue a página.");
+                return;
+            }
+            console.log("📍 Chamando fetchAllFollowers");
+            tikTokManager.fetchAllFollowers();
+        }
+
+        function loadLiveStatus() {
+            if (!ensureTikTokManager()) {
+                alert("Sistema ainda está carregando. Recarregue a página.");
+                return;
+            }
+            console.log("📍 Chamando loadLiveStatus");
+            tikTokManager.loadLiveStatus();
+        }
+
+        // Debug: mostrar estado inicial
+        console.log("🔧 Wrapper functions definidas. Estado inicial:");
+        console.log("   - TikTokManager class:", typeof TikTokManager);
+        console.log("   - tikTokManager instance:", tikTokManager);
+    </script>
+    
     <div class="container">
         <div class="header">
             <h1>🎬 Gerenciar Autenticação TikTok</h1>
@@ -308,7 +371,7 @@ $conn->close();
         <div class="section">
             <h2>⚡ Ações Rápidas</h2>
             <div class="action-buttons">
-                <button class="btn btn-primary" onclick="tikTokManager.fetchAllFollowers()" data-action="fetch-all">
+                <button class="btn btn-primary" onclick="fetchAllFollowers()" data-action="fetch-all">
                     🔄 Buscar Seguidores de Todos
                 </button>
                 <a href="/" class="btn btn-primary" style="text-decoration: none; display: inline-flex; align-items: center;">
@@ -338,7 +401,7 @@ $conn->close();
                         <div class="stat-label">Offline</div>
                     </div>
                     <div class="stat-item">
-                        <button class="btn btn-secondary" onclick="tikTokManager.loadLiveStatus()">
+                        <button class="btn btn-secondary" onclick="loadLiveStatus()">
                             🔄 Atualizar
                         </button>
                     </div>
@@ -383,11 +446,11 @@ $conn->close();
                         </div>
 
                         <div class="perfil-actions">
-                            <button class="btn-small" onclick="tikTokManager.authenticate('<?php echo htmlspecialchars($perfil['avatar_nome']); ?>')">
+                            <button class="btn-small" onclick="authenticate('<?php echo htmlspecialchars($perfil['avatar_nome']); ?>')">
                                 <?php echo $perfil['autenticado'] ? '🔄 Renovar' : '🔐 Autenticar'; ?>
                             </button>
                             <?php if ($perfil['autenticado'] && !$perfil['token_expirado']): ?>
-                                <button class="btn-small" onclick="tikTokManager.fetchFollowers('<?php echo htmlspecialchars($perfil['avatar_nome']); ?>')" data-action="fetch" data-avatar="<?php echo htmlspecialchars($perfil['avatar_nome']); ?>">
+                                <button class="btn-small" onclick="fetchFollowers('<?php echo htmlspecialchars($perfil['avatar_nome']); ?>')" data-action="fetch" data-avatar="<?php echo htmlspecialchars($perfil['avatar_nome']); ?>">
                                     📊 Buscar Agora
                                 </button>
                             <?php endif; ?>
@@ -398,6 +461,24 @@ $conn->close();
         </div>
     </div>
 
-    <script src="/js/tiktok-manager.js"></script>
+    <script src="js/tiktok-manager.js"></script>
+    <script>
+        // Criar instância assim que o script carrega
+        setTimeout(function() {
+            if (typeof TikTokManager !== 'undefined' && !tikTokManager) {
+                try {
+                    tikTokManager = new TikTokManager();
+                    console.log("✅ TikTokManager criado com sucesso no timeout");
+                    console.log("   - Métodos disponíveis:", Object.getOwnPropertyNames(Object.getPrototypeOf(tikTokManager)));
+                } catch (error) {
+                    console.error("❌ Erro ao criar TikTokManager:", error);
+                }
+            } else {
+                console.log("🔍 Estado no timeout:");
+                console.log("   - TikTokManager:", typeof TikTokManager);
+                console.log("   - tikTokManager:", tikTokManager);
+            }
+        }, 500);
+    </script>
 </body>
 </html>

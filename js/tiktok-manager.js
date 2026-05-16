@@ -5,8 +5,8 @@
 
 class TikTokManager {
 	constructor() {
-		this.baseUrl = "/api/tiktok-oauth.php";
-		this.fetchUrl = "/api/fetch-followers.php";
+		this.baseUrl = "api/tiktok-oauth.php";
+		this.fetchUrl = "api/fetch-followers.php";
 		this.avatares = ["Ana", "Megg", "Bia", "Luna", "Mel"];
 	}
 
@@ -208,7 +208,7 @@ class TikTokManager {
 	async loadLiveStatus() {
 		try {
 			// Fazer requisição para buscar dados recentes
-			const response = await fetch("/api/fetch-followers.php");
+			const response = await fetch("api/fetch-followers.php");
 			const data = await response.json();
 
 			if (!data.success) {
@@ -217,7 +217,7 @@ class TikTokManager {
 			}
 
 			// Buscar últimos registros para cada avatar
-			const response2 = await fetch("/api/check-live-status.php");
+			const response2 = await fetch("api/check-live-status.php");
 			const liveData = response2.ok ? await response2.json() : { data: {} };
 
 			// Contar avatares ao vivo
@@ -263,15 +263,3 @@ class TikTokManager {
 		}
 	}
 }
-
-// Instância global
-const tikTokManager = new TikTokManager();
-
-// Carregar status ao iniciar
-document.addEventListener("DOMContentLoaded", () => {
-	tikTokManager.loadStatus();
-	// Se estiver na página admin, carregar também status ao vivo
-	if (document.getElementById("ao-vivo-count")) {
-		tikTokManager.loadLiveStatus();
-	}
-});
