@@ -220,6 +220,63 @@ table tbody tr:last-child td {
 	background: linear-gradient(135deg, #fbcf33, #cd7f32);
 }
 
+.ao-vivo-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border-radius: 20px;
+	background-color: rgba(107, 114, 128, 0.2);
+	color: var(--text-secondary);
+	font-size: 0.9em;
+	font-weight: 600;
+	transition: all 0.3s ease;
+	border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+.ao-vivo-badge.ativo {
+	background: linear-gradient(
+		135deg,
+		rgba(239, 68, 68, 0.3),
+		rgba(220, 38, 38, 0.2)
+	);
+	color: #ef4444;
+	border-color: rgba(239, 68, 68, 0.5);
+	animation: pulse-red 2s infinite;
+}
+
+.tiktok-seguidores-value {
+	display: inline-block;
+	padding: 6px 12px;
+	border-radius: 20px;
+	background-color: rgba(16, 185, 129, 0.15);
+	color: #34d399;
+	font-size: 0.95em;
+	font-weight: 700;
+	border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.tiktok-seguidores-empty {
+	display: inline-block;
+	padding: 6px 12px;
+	border-radius: 20px;
+	background-color: rgba(107, 114, 128, 0.2);
+	color: var(--text-secondary);
+	font-size: 0.85em;
+	font-weight: 600;
+	border: 1px solid rgba(107, 114, 128, 0.35);
+}
+
+@keyframes pulse-red {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.7;
+	}
+}
+
 .seguidores-input {
 	width: 120px;
 	padding: 8px 12px;

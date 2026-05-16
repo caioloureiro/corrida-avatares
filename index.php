@@ -50,6 +50,20 @@ while ($row = $result->fetch_assoc()) {
 $media_seguidores = count($avatares) > 0 ? intval($total_seguidores / count($avatares)) : 0;
 $progresso_total = count($avatares) > 0 ? ($total_seguidores / ($META_SEGUIDORES * count($avatares))) * 100 : 0;
 
+// Contar avatares ao vivo (se coluna existir)
+$avatares_ao_vivo = 0;
+$checkColumn = $conn->query("SHOW COLUMNS FROM corrida LIKE 'ao_vivo'");
+if ($checkColumn && $checkColumn->num_rows > 0) {
+	$sql_ao_vivo = "SELECT COUNT(*) as ao_vivo_count FROM corrida WHERE ativo = 1 AND id IN (
+	    SELECT MAX(id) FROM corrida WHERE ativo = 1 GROUP BY nome
+	) AND ao_vivo = 1";
+	$result_ao_vivo = $conn->query($sql_ao_vivo);
+	if ($result_ao_vivo) {
+		$row_ao_vivo = $result_ao_vivo->fetch_assoc();
+		$avatares_ao_vivo = intval($row_ao_vivo['ao_vivo_count']);
+	}
+}
+
 // Buscar data da última modificação
 $sql_data = "SELECT MAX(updated_at) as ultima_atualizacao FROM corrida WHERE ativo = 1";
 $result_data = $conn->query($sql_data);
@@ -158,7 +172,7 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 			</div>
 
 			<div class="stat-card">
-				<h3>Última Atualização</h3>
+				<h3></h3>Última Atualização</h3>
 				<div class="value" style="font-size: 1.2em;">🕐</div>
 				<div class="meta"><?php echo $data_formatada; ?></div>
 			</div>
@@ -198,6 +212,7 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 						<th>Avatar</th>
 						<th>Seguidores</th>
 						<th>Progresso</th>
+							<th>Seguidores TikTok</th>
 						<th>Percentual</th>
 						<th>Atualizações</th>
 					</tr>
@@ -233,12 +248,21 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 									min="0"
 									placeholder="0">
 								<button class="btn-gravar" onclick="gravarSeguidores(this)">Gravar</button>
-								<span class="loading"></span>
-							</td>
+								</td>
 							<td>
 								<div class="progress-bar-container">
 									<div class="progress-bar" style="width: <?php echo min($avatar['percentual'], 100); ?>%"></div>
 								</div>
+							</td>
+							<td>
+								<?php $seguidoresTikTok = isset($avatar['tiktok_seguidores']) ? intval($avatar['tiktok_seguidores']) : 0; ?>
+								<?php if ($seguidoresTikTok > 0): ?>
+									<span class="tiktok-seguidores-value" title="Valor retornado pela API do TikTok">
+										<?php echo number_format($seguidoresTikTok, 0, ',', '.'); ?>
+									</span>
+								<?php else: ?>
+									<span class="tiktok-seguidores-empty">Nao sincronizado</span>
+								<?php endif; ?>
 							</td>
 							<td>
 								<span class="percentage"><?php echo number_format($avatar['percentual'], 2, ',', '.'); ?>%</span>
