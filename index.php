@@ -212,7 +212,6 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 						<th>Avatar</th>
 						<th>Seguidores</th>
 						<th>Progresso</th>
-							<th>Seguidores TikTok</th>
 						<th>Percentual</th>
 						<th>Atualizações</th>
 					</tr>
@@ -253,16 +252,6 @@ $perfil_mel = 'https://www.tiktok.com/@mel329647';
 								<div class="progress-bar-container">
 									<div class="progress-bar" style="width: <?php echo min($avatar['percentual'], 100); ?>%"></div>
 								</div>
-							</td>
-							<td>
-								<?php $seguidoresTikTok = isset($avatar['tiktok_seguidores']) ? intval($avatar['tiktok_seguidores']) : 0; ?>
-								<?php if ($seguidoresTikTok > 0): ?>
-									<span class="tiktok-seguidores-value" title="Valor retornado pela API do TikTok">
-										<?php echo number_format($seguidoresTikTok, 0, ',', '.'); ?>
-									</span>
-								<?php else: ?>
-									<span class="tiktok-seguidores-empty" title="Autentique em admin-tiktok.php e clique em Buscar Agora">Não sincronizado</span>
-								<?php endif; ?>
 							</td>
 							<td>
 								<span class="percentage"><?php echo number_format($avatar['percentual'], 2, ',', '.'); ?>%</span>

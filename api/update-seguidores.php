@@ -19,8 +19,34 @@ $agora = date('Y-m-d H:i:s');
 $tiktokSeguidores = 0;
 $aoVivo = 0;
 
+$hasTikTokSeguidores = false;
+$hasAoVivo = false;
+
+$checkTikTokCol = $conn->query("SHOW COLUMNS FROM corrida LIKE 'tiktok_seguidores'");
+if ($checkTikTokCol && $checkTikTokCol->num_rows > 0) {
+	$hasTikTokSeguidores = true;
+}
+
+$checkAoVivoCol = $conn->query("SHOW COLUMNS FROM corrida LIKE 'ao_vivo'");
+if ($checkAoVivoCol && $checkAoVivoCol->num_rows > 0) {
+	$hasAoVivo = true;
+}
+
 // Preserva último valor vindo do TikTok para não "contaminar" a coluna de comparação.
-$stmtLast = $conn->prepare("SELECT tiktok_seguidores, ao_vivo FROM corrida WHERE ativo = 1 AND nome = ? ORDER BY id DESC LIMIT 1");
+$selectFields = [];
+if ($hasTikTokSeguidores) {
+	$selectFields[] = 'tiktok_seguidores';
+}
+if ($hasAoVivo) {
+	$selectFields[] = 'ao_vivo';
+}
+
+$stmtLast = null;
+if (!empty($selectFields)) {
+	$stmtLast = $conn->prepare(
+		"SELECT " . implode(', ', $selectFields) . " FROM corrida WHERE ativo = 1 AND nome = ? ORDER BY id DESC LIMIT 1"
+	);
+}
 if ($stmtLast) {
 	$stmtLast->bind_param('s', $nome);
 	$stmtLast->execute();
@@ -37,10 +63,29 @@ if ($stmtLast) {
 	$stmtLast->close();
 }
 
-$stmtInsert = $conn->prepare(
-	"INSERT INTO corrida (ativo, nome, seguidores, tiktok_seguidores, ao_vivo, data, created_at, updated_at)
-	 VALUES (1, ?, ?, ?, ?, ?, ?, ?)"
-);
+$stmtInsert = null;
+
+if ($hasTikTokSeguidores && $hasAoVivo) {
+	$stmtInsert = $conn->prepare(
+		"INSERT INTO corrida (ativo, nome, seguidores, tiktok_seguidores, ao_vivo, data, created_at, updated_at)
+		 VALUES (1, ?, ?, ?, ?, ?, ?, ?)"
+	);
+} elseif ($hasTikTokSeguidores) {
+	$stmtInsert = $conn->prepare(
+		"INSERT INTO corrida (ativo, nome, seguidores, tiktok_seguidores, data, created_at, updated_at)
+		 VALUES (1, ?, ?, ?, ?, ?, ?)"
+	);
+} elseif ($hasAoVivo) {
+	$stmtInsert = $conn->prepare(
+		"INSERT INTO corrida (ativo, nome, seguidores, ao_vivo, data, created_at, updated_at)
+		 VALUES (1, ?, ?, ?, ?, ?, ?)"
+	);
+} else {
+	$stmtInsert = $conn->prepare(
+		"INSERT INTO corrida (ativo, nome, seguidores, data, created_at, updated_at)
+		 VALUES (1, ?, ?, ?, ?, ?)"
+	);
+}
 
 if (!$stmtInsert) {
 	http_response_code(500);
@@ -51,8 +96,15 @@ if (!$stmtInsert) {
 	$conn->close();
 	exit;
 }
-
-$stmtInsert->bind_param('siiisss', $nome, $seguidores, $tiktokSeguidores, $aoVivo, $agora, $agora, $agora);
+if ($hasTikTokSeguidores && $hasAoVivo) {
+	$stmtInsert->bind_param('siiisss', $nome, $seguidores, $tiktokSeguidores, $aoVivo, $agora, $agora, $agora);
+} elseif ($hasTikTokSeguidores) {
+	$stmtInsert->bind_param('siisss', $nome, $seguidores, $tiktokSeguidores, $agora, $agora, $agora);
+} elseif ($hasAoVivo) {
+	$stmtInsert->bind_param('siisss', $nome, $seguidores, $aoVivo, $agora, $agora, $agora);
+} else {
+	$stmtInsert->bind_param('sisss', $nome, $seguidores, $agora, $agora, $agora);
+}
 
 if ($stmtInsert->execute()) {
 	echo json_encode([
